@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gemini Multimodal Chatbot</title>
+</head>
+<body>
+    <h1>Gemini Multimodal Chatbot</h1>
+    <form id="chat-form" method="POST" enctype="multipart/form-data">
+        <label for="prompt">Prompt:</label><br>
+        <textarea id="prompt" name="prompt"></textarea><br><br>
+
+        <input type="file" name="files" multiple><br><br>
+
+        <button type="submit">Send</button>
+    </form>
+
+    <div id="response"></div>
+
+
+    <script>
+        const form = document.getElementById('chat-form');
+        const responseDiv = document.getElementById('response');
+        const textarea = document.getElementById('prompt');
+
+        let timeout;  // For debouncing
+        textarea.addEventListener('input', () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                // You might trigger some UI update here to indicate typing or processing.
+            }, 300); // 300ms debounce delay
+        });
+
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); 
+
+            const formData = new FormData(form);
+
+            responseDiv.innerHTML = "<p>Processing...</p>"; // Indicate processing to the user
+
+            try {
+                const response = await fetch('/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (data.error) {
+                    responseDiv.innerHTML = `<p style="color: red;">${data.error}</p>`;
+                } else {
+                    responseDiv.innerHTML = `<p>${data.response}</p>`;
+                }
+            } catch (error) {
+                responseDiv.innerHTML = "<p style='color: red;'>An error occurred. Please try again.</p>";
+                console.error("Error:", error);  // Log the error to the console
+            }
+
+        });
+
+
+    </script>
+</body>
+</html>
